@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hashtrail-local"
+version = "1.0.0"
+description = "Offline SHA-256 file integrity snapshots and readable change reports"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "IFTIKHAR"}]
+dependencies = []
+
+[project.scripts]
+hashtrail = "hashtrail.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["hashtrail*"]
+
+[project.urls]
+Repository = "https://github.com/specter-sec/hashtrail"
+Issues = "https://github.com/specter-sec/hashtrail/issues"
