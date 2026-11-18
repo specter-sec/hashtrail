@@ -1,0 +1,34 @@
+name: Tests and integrity checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit and CLI regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Compile modules
+        run: python -m compileall -q hashtrail tests demo.py
+      - name: Real CLI round trip
+        run: |
+          mkdir -p "$RUNNER_TEMP/hashtrail-fixture"
+          printf 'fictional CI fixture\n' > "$RUNNER_TEMP/hashtrail-fixture/note.txt"
+          python -m hashtrail snapshot "$RUNNER_TEMP/hashtrail-fixture" --output "$RUNNER_TEMP/hashtrail-manifest.json"
+          python -m hashtrail verify "$RUNNER_TEMP/hashtrail-manifest.json" "$RUNNER_TEMP/hashtrail-fixture" --format json
